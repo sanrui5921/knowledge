@@ -1,0 +1,15 @@
+git:
+  taskdb:
+    cron: 3000
+    max-limit: 5000
+    lock-time: 20000
+    config[0]:
+      type: insert
+      module-name: TUser insert
+      cron: 3000
+      clazz: com.git.task.entity.TUser
+    config[1]:
+      type: update
+      module-name: TUser update
+      cron: 3000
+      clazz: com.git.task.entity.TUser
