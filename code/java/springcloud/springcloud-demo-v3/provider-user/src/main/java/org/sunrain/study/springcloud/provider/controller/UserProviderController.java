@@ -22,10 +22,4 @@ public class UserProviderController {
     public User add(@RequestBody User user) {
         return userService.add(user);
     }
-
-    // 接口访问的服务
-    @RequestMapping("/getInfo")
-    public Object getInfo() {
-        return "I am info from server";
-    }
 }

@@ -1,0 +1,13 @@
+# 指定运行端口
+server:
+  port: 8001
+
+# 指定服务名称
+spring:
+  application:
+    name: provider-user
+  cloud:
+    zookeeper:
+      connect-string: localhost:3181
+      discovery:
+        enabled: true
