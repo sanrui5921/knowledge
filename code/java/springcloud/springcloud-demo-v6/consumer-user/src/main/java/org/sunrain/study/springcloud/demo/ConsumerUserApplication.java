@@ -1,16 +1,17 @@
-package org.sunrain.study.springcloud.provider;
+package org.sunrain.study.springcloud.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
-//https://www.cnblogs.com/xishuai/p/spring-cloud-consul-sample.html
-
+@EnableFeignClients
 @EnableDiscoveryClient
 @SpringBootApplication
-public class ProviderUserApplication {
+public class ConsumerUserApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ProviderUserApplication.class);
+        SpringApplication.run(ConsumerUserApplication.class, args);
     }
+
 }

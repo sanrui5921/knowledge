@@ -6,11 +6,8 @@ server:
 spring:
   application:
     name: provider-user
-
   cloud:
-    consul:
-      host: 127.0.0.1
-      port: 8500
+    zookeeper:
+      connect-string: localhost:3181
       discovery:
-        register: true
-        serviceName: ${spring.application.name}
+        enabled: true

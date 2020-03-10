@@ -1,0 +1,4 @@
+org/sunrain/study/springcloud/consumer/ConsumerUserApplication.class
+org/sunrain/study/springcloud/consumer/configuration/SpringConfiguration.class
+org/sunrain/study/springcloud/consumer/entity/User.class
+org/sunrain/study/springcloud/consumer/controller/ConsumerUserController.class

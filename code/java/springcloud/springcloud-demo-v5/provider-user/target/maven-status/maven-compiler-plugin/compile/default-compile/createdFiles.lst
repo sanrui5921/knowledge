@@ -1,0 +1,5 @@
+org/sunrain/study/springcloud/provider/entity/User.class
+org/sunrain/study/springcloud/provider/controller/UserProviderController.class
+org/sunrain/study/springcloud/provider/dao/UserDao.class
+org/sunrain/study/springcloud/provider/ProviderUserApplication.class
+org/sunrain/study/springcloud/provider/service/UserService.class
