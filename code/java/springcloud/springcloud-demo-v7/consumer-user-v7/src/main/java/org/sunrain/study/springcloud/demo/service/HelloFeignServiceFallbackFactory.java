@@ -13,7 +13,7 @@ public class HelloFeignServiceFallbackFactory implements FallbackFactory<HelloFe
             @Override
             public String hello(String name) {
                 System.out.println("hello降级了。。。。");
-                return null;
+                return new String("hello降级了。。。。");
             }
 
             @Override
