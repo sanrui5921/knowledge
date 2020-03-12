@@ -5,8 +5,34 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      routes:
-        - id: url-proxy-1
-          uri: https://blog.csdn.net
-          predicates:
-            - Path=/csdn
+      discovery:
+        locator:
+          enabled: true
+#      routes:
+#        - id: 8001
+#          uri: http://127.0.0.1:8001/hello
+#          predicates:
+#            - Host=**.csdn.** # 请求域名携带csdn的,则转发
+#        - id: 8002
+#          uri: http://127.0.0.1:8002/hello
+#          predicates:
+#            - Header=request, \d+ # 如果请求头含有request,且为数字,则转发
+#        - id: host_route
+#          uri: http://httpbin.org:80/get
+#          predicates:
+#            - Host=**.csdn.** # 请求域名携带csdn的,则转发
+#        - id: query_route
+#          uri: http://httpbin.org:80/get
+#          predicates:
+#            - Query=username, zzz* # 请求参数含有username,且值满足zzz开头的,则转发(对值的匹配可以省略)
+#        - id: header_route
+#          uri: http://httpbin.org:80/get
+#          predicates:
+#            - Header=request, \d+ # 如果请求头含有request,且为数字,则转发
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka/
+logging:
+  level:
+    org.springframework.cloud.gateway: debug
