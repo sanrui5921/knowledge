@@ -1,10 +1,10 @@
-package org.sunrain.study.springcloud.config.demo;
+package org.sunrain.study.springcloud.eurekaserver.demo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ConfigClientV9ApplicationTests {
+class EurekaServerDemoApplicationTests {
 
     @Test
     void contextLoads() {

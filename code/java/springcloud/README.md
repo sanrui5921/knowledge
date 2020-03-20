@@ -7,3 +7,4 @@ springcloud-demo-v6 引入OpenFeign
 springcloud-demo-v7 引入Hystrix(50%)
 springcloud-demo-v8 引入Gateway(50%, 与Eureka等的联动还未加入)
 springcloud-demo-v9 spring cloud config示例
+springcloud-demo-v10 spring cloud config示例(手动刷新)
