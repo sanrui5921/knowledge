@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <audio id="gameSpeaker" autoplay></audio>
+    <video id="gameScreen" autoplay width=1920 height=1200 style="width:100%; height:100%; object-fit:fill; cursor:none; border: solid 1px;"></video>
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script>
+        function toUint32(u8) {
+            var uint = (u8[3] | u8[2] << 8 | u8[1] << 16 | u8[0] << 24) >>> 0;
+            return uint;
+        }
+        function toInt32(i8) {
+            var int = i8[3] | i8[2] << 8 | i8[1] << 16 | i8[0] << 24;
+            return int;
+        }
+
+        function uuid() {
+            function S4() {
+                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+            }
+            return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+        }
+
+        function print_object(object) {
+            var obj = object;
+            var str = "";
+            for (each in object) {
+                str += each + "=" + object[each] + ";";
+            }
+            console.log("print_object:" + str);
+        }
+
+        class MediaStream {
+            uuid;
+            name;
+            sourceBuffer;
+            appendBufferTime = 0;
+            frameSpeedCtrl;
+            updateFinish = false;
+
+            appendFrame(buffer, juuid) {
+                this.uuid = juuid;
+                while(!this.sourceBuffer.updating){
+                    this.sourceBuffer.appendBuffer(buffer);
+                }
+            }
+
+            onUpdateEnd(ev) {
+                updateFinish = true;
+                console.log("", event);
+                //this.frameSpeedCtrl.run(this.uuid);
+            }
+
+            constructor(name, elem, mediaSource, codec) {
+                this.name = name;
+                this.frameSpeedCtrl = new FrameSpeedCtrl(name, elem, this);
+                if("audio" == this.name){
+                    this.sourceBuffer = mediaSource.addSourceBuffer(codec);
+                    this.sourceBuffer.addEventListener('updateend', this.onUpdateEnd.bind(this));
+                    this.sourceBuffer.addEventListener('error', function (ev) {
+                        console.log("error ", ev);
+                    });
+                }
+            }
+        }
+
+        function remoteCtrl(){
+
+        }
+
+    </script>
+
+    <script>
+        const audioContentType = 'audio/mp4; codecs="mp4a.40.2"'; // AAC-LC
+
+        const videoContentType = 'video/mp4; codecs="avc1.64001F"'; // High profile level 3.1
+
+        var videoElem = document.getElementById('gameScreen');
+
+        var videoSource = new MediaSource();
+
+        function parseFrame(input, juuid) {
+            var isVideo = false;
+            var frameSize = toInt32(input.slice(0, 4));
+            return [frameSize > 0, input.slice(4)];
+        }
+
+        function onRecv(event) {
+            var juuid = uuid();
+            var input = new Uint8Array(event.data);
+            var ret;
+            ret = parseFrame(input, juuid);
+            if(ret[0]){
+                videoStream.appendFrame(ret[1], juuid);
+            } else {
+                audioStream.appendFrame(ret[1], juuid);
+            }
+        }
+
+        function entry(event) {
+            remoteCtrl();
+            videoElem.removeEventListener("click", clickEvent);
+            videoElem.src = URL.createObjectURL(videoSource);
+            videoSource.addEventListener('sourceopen', handleSourceOpen.bind(videoSource));
+            function handleSourceOpen() {
+                videoStream = new MediaStream("video", videoElem, videoSource, videoContentType);
+                audioStream = new MediaStream("audio", videoElem, videoSource, audioContentType);
+
+                client = new WebSocket('ws://' + location.hostname + ':8080/ws', "webgame");
+                client.binaryType = 'arraybuffer';
+                client.onmessage = onRecv;
+                client.onerror = function (event) {
+                    console.log("websocket error:", event);
+                };
+                client.onclose = function(event){
+                    console.log("websocket closed websocket:");
+                }
+            };
+        }
+
+        videoElem.addEventListener("click", entry);
+
+    </script>
+</body>
+</html>

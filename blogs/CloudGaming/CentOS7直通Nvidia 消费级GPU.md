@@ -40,7 +40,7 @@
 yum install net-tools vim wget kernel-devel virt-manager qemu-img qemu-kvm qemu-kvm-tools libvirt virt-install bridge-utils -y
 ```
 
-## kvm相关安装包及其作用
+kvm相关安装包及其作用
 
 ```
 qemu-kvm          主要的KVM程序包
@@ -217,6 +217,10 @@ virsh edit win
 #找到<features>节点，添加内容
 <features>
 ... 
+  <hyperv>
+      ... 
+      <vendor_id state='on' value='1234567890ab'/>
+    </hyperv>
   <kvm>
     <hidden state='on'/>
   </kvm>
@@ -228,6 +232,9 @@ virsh edit win
   <qemu:arg value='-cpu'/>
   <qemu:arg value='host,hv_time,kvm=off,hv_vendor_id=null'/>
 </qemu:commandline>
+
+<os>中添加
+<nvram template='/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-efi.fd'>/var/lib/libvirt/qemu/nvram/win***_VARS.fd</nvram>
 ```
 
 
@@ -246,15 +253,15 @@ virsh edit win
 
 qemu-kvm未升级到2.9以上
 
+## 4. 虚机里的NVIDIA显示设置不可用
 
+![image-20200320173513254](/Users/qichao/knowledge/blogs/CloudGaming/image-20200320173513254.png)
+
+此问题的原因是，nvidia卡未连接显示器
 
 
 
 # 暂未解问题
-
-## 1. 虚机里的NVIDIA显示设置不可用
-
-![image-20200320173513254](/Users/qichao/knowledge/blogs/CloudGaming/image-20200320173513254.png)
 
 # 参考
 
@@ -265,3 +272,7 @@ https://www.jianshu.com/p/8074abc26b88
 https://www.jianshu.com/p/ffc37624e5ae
 
 https://blog.51cto.com/13810716/2440319
+
+https://www.cnblogs.com/fuleying/p/3622908.html
+
+https://davidyat.es/2016/09/08/gpu-passthrough/#using-a-bash-script

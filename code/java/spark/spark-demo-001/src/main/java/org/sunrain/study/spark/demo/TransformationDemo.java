@@ -1,12 +1,14 @@
 package org.sunrain.study.spark.demo;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.VoidFunction;
+import scala.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +27,126 @@ public class TransformationDemo {
 //        flatMap(sc);
 //        mapPartitions(sc);
 //        mapPartitionsWithIndex(sc);
-        reduce(sc);
+        //reduce(sc);
+        //reduceByKey(sc);
+        //union(sc);
+        //groupByKey(sc);
+        sample(sc);
+    }
+
+    public static void sample(JavaSparkContext sc) {
+        ArrayList<Integer> list = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            list.add(i);
+        }
+        JavaRDD<Integer> listRDD = sc.parallelize(list);
+        /**
+         * sample用来从RDD中抽取样本。他有三个参数
+         * withReplacement: Boolean,
+         *       true: 有放回的抽样
+         *       false: 无放回抽象
+         * fraction: Double：
+         *      抽取样本的比例
+         * seed: Long：
+         *      随机种子
+         */
+        JavaRDD<Integer> sampleRDD = listRDD.sample(false, 0.1, 0);
+        sampleRDD.foreach(new VoidFunction<Integer>() {
+            @Override
+            public void call(Integer num) throws Exception {
+                System.out.print(num + " ");
+            }
+        });
+    }
+
+    public static void join(JavaSparkContext sc) {
+        final List<Tuple2<Integer, String>> names = Arrays.asList(
+                new Tuple2<Integer, String>(1, "东方不败"),
+                new Tuple2<Integer, String>(2, "令狐冲"),
+                new Tuple2<Integer, String>(3, "林平之")
+        );
+        final List<Tuple2<Integer, Integer>> scores = Arrays.asList(
+                new Tuple2<Integer, Integer>(1, 99),
+                new Tuple2<Integer, Integer>(2, 98),
+                new Tuple2<Integer, Integer>(3, 97)
+        );
+
+        final JavaPairRDD<Integer, String> nemesrdd = sc.parallelizePairs(names);
+        final JavaPairRDD<Integer, Integer> scoresrdd = sc.parallelizePairs(scores);
+        /**
+         * <Integer, 学号
+         * Tuple2<String, 名字
+         * Integer>> 分数
+         */
+        final JavaPairRDD<Integer, Tuple2<String, Integer>> joinRDD = nemesrdd.join(scoresrdd);
+//        final JavaPairRDD<Integer, Tuple2<Integer, String>> join = scoresrdd.join(nemesrdd);
+        joinRDD.foreach(new VoidFunction<Tuple2<Integer, Tuple2<String, Integer>>>() {
+            @Override
+            public void call(Tuple2<Integer, Tuple2<String, Integer>> tuple) throws Exception {
+                System.out.println("学号：" + tuple._1 + " 名字：" + tuple._2._1 + " 分数：" + tuple._2._2);
+            }
+        });
+    }
+
+    public static void groupByKey(JavaSparkContext sc) {
+        List<Tuple2<String, String>> list = Arrays.asList(
+                new Tuple2("武当", "张三丰"),
+                new Tuple2("峨眉", "灭绝师太"),
+                new Tuple2("武当", "宋青书"),
+                new Tuple2("峨眉", "周芷若")
+        );
+        JavaPairRDD<String, String> listRDD = sc.parallelizePairs(list);
+
+        JavaPairRDD<String, Iterable<String>> groupByKeyRDD = listRDD.groupByKey();
+        groupByKeyRDD.foreach(new VoidFunction<Tuple2<String, Iterable<String>>>() {
+            @Override
+            public void call(Tuple2<String, Iterable<String>> tuple) throws Exception {
+                String menpai = tuple._1;
+                Iterator<String> iterator = tuple._2.iterator();
+                String people = "";
+                while (iterator.hasNext()) {
+                    people = people + iterator.next() + " ";
+                }
+                System.out.println("门派:" + menpai + "人员:" + people);
+            }
+        });
+    }
+
+    public static void union(JavaSparkContext sc) {
+        final List<Integer> list1 = Arrays.asList(1, 2, 3, 4);
+        final List<Integer> list2 = Arrays.asList(3, 4, 5, 6);
+        final JavaRDD<Integer> rdd1 = sc.parallelize(list1);
+        final JavaRDD<Integer> rdd2 = sc.parallelize(list2);
+        rdd1.union(rdd2)
+                .foreach(new VoidFunction<Integer>() {
+                    @Override
+                    public void call(Integer number) throws Exception {
+                        System.out.println(number + "");
+                    }
+                });
+    }
+
+    public static void reduceByKey(JavaSparkContext sc) {
+        List<Tuple2<String, Integer>> list = Arrays.asList(
+                new Tuple2<String, Integer>("武当", 99),
+                new Tuple2<String, Integer>("少林", 97),
+                new Tuple2<String, Integer>("武当", 89),
+                new Tuple2<String, Integer>("少林", 77)
+        );
+        JavaPairRDD<String, Integer> listRDD = sc.parallelizePairs(list);
+        //运行reduceByKey时，会将key值相同的组合在一起做call方法中的操作
+        JavaPairRDD<String, Integer> result = listRDD.reduceByKey(new Function2<Integer, Integer, Integer>() {
+            @Override
+            public Integer call(Integer i1, Integer i2) throws Exception {
+                return i1 + i2;
+            }
+        });
+        result.foreach(new VoidFunction<Tuple2<String, Integer>>() {
+            @Override
+            public void call(Tuple2<String, Integer> tuple) throws Exception {
+                System.out.println("门派: " + tuple._1 + "->" + tuple._2);
+            }
+        });
     }
 
     public static void reduce(JavaSparkContext sc) {
